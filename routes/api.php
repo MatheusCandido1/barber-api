@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BarberController;
@@ -20,8 +21,8 @@ Route::get('/users/favorites', [UserController::class, 'getFavorites']);
 Route::post('/users/favorites', [UserController::class, 'setFavorites']);
 Route::get('/users/appointments', [UserController::class, 'getAppointments']);
 
-Route::get('/barbers', [BarberController::class, 'index']);
+Route::get('/barbers', [BarberController::class, 'getBarber']);
 Route::get('/barbers/{barber}', [BarberController::class, 'details']);
 Route::post('/barbers/{barber}/appointment', [BarberController::class, 'setAppointment']);
 
-Route::get('/search', [BarberController::class, 'getBarbers']);
+Route::get('/search', [BarberController::class, 'getBarbers']); 
