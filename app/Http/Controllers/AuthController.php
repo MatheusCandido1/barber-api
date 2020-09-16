@@ -14,6 +14,7 @@ class AuthController extends Controller
     }
 
     public function register(Request $request) {  
+
         $validator = Validator::make($request->all() , [
             'name' => 'required',
             'email' => 'required|email',
@@ -73,5 +74,12 @@ class AuthController extends Controller
                 'data' => $data,
                 'token' => $token
             ], 200);
+    }
+
+    public function logout() {
+        auth()->logout();
+        return response()->json([
+            'success_message' => 'Logout realizado'
+        ], 200);
     }
 }
