@@ -82,4 +82,14 @@ class AuthController extends Controller
             'success_message' => 'Logout realizado'
         ], 200);
     }
+
+    public function refresh() {
+        $token = auth()->refresh();
+        $data = auth()->user();
+        $data['avatar'] = url('media/avatars/'.$data['avatar']);
+            return response()->json([
+                'data' => $data,
+                'token' => $token
+            ], 200);
+    }
 }
