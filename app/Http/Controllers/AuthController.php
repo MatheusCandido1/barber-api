@@ -10,7 +10,7 @@ use App\Models\User;
 class AuthController extends Controller
 {
     public function __construct() {
-        $this->middleware('auth:api', ['except' => ['register','login']]);
+        $this->middleware('auth:api', ['except' => ['register','login','unauthorized']]);
     }
 
     public function register(Request $request) {  
@@ -91,5 +91,11 @@ class AuthController extends Controller
                 'data' => $data,
                 'token' => $token
             ], 200);
+    }
+
+    public function unauthorized() {
+        return response()->json([
+            'error' => 'Não autorizado'
+        ], 401);
     }
 }
