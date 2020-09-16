@@ -10,7 +10,7 @@ use App\Models\User;
 class AuthController extends Controller
 {
     public function __construct() {
-        $this->middleware('auth:api', ['except' => ['register']]);
+        $this->middleware('auth:api', ['except' => ['register','login']]);
     }
 
     public function register(Request $request) {  
@@ -26,7 +26,7 @@ class AuthController extends Controller
             $user = new User();
             $user->name = $request->input('name');
             $user->email = $request->input('email');
-            $user->password = password_hash($request->input('password'), PASSWORD_DEFAULT);
+            $user->password = bcrypt($request->input('password'));
 
             $user->save();
 
@@ -44,7 +44,7 @@ class AuthController extends Controller
                 ], 200);
             } else {
                 return response()->json([
-                    'error' => 'Unauthorized'
+                    'error_message' => 'Não autorizado'
                 ], 401);
             }
         } else {
@@ -53,5 +53,25 @@ class AuthController extends Controller
             ], 400);
         }
         
+    }
+
+    public function login(Request $request) {
+
+        $credentials = $request->only('email','password');
+        $token = auth()->attempt($credentials);
+
+        if(!$token) {
+            return response()->json([
+                'error' => 'E-mail e/ou senha incorretos'
+            ], 401);
+        }
+
+        $data = auth()->user();
+        $data['avatar'] = url('media/avatars/'.$data['avatar']);
+            return response()->json([
+                'success_message' => 'Login realizado',
+                'data' => $data,
+                'token' => $token
+            ], 200);
     }
 }
