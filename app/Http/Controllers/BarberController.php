@@ -19,8 +19,4 @@ class BarberController extends Controller
         $this->middleware('auth:api');
         $this->currentUser = auth()->user();
     }
-
-    public function random() {
-         
-    }
 }
