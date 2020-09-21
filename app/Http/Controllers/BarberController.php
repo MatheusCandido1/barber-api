@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\UserAppointment;
+use App\Models\UserFavorite;
 use App\Models\Barber;
 use App\Models\BarberImage;
 use App\Models\BarberService;
@@ -93,6 +94,15 @@ class BarberController extends Controller
             $barber['testimonials'] = [];
             $barber['availability'] = [];
 
+            // Handling Favorites 
+
+            $favorite = UserFavorite::where('user_id', $this->currentUser->id)
+            ->where('barber_id', $barber->id)
+            ->count();
+
+            if($favorite > 0) {
+                $barber['favorite'] = true; 
+            }
             // Handling Images
             $barber['images'] = BarberImage::select(['url'])
             ->where('barber_id', $barber->id)
