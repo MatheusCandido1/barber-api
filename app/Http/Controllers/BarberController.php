@@ -19,4 +19,13 @@ class BarberController extends Controller
         $this->middleware('auth:api');
         $this->currentUser = auth()->user();
     }
+
+    public function getBarbers(Request $request) {
+        $barbers = Barber::all();
+
+        return response()->json([
+            'data' => $barbers,
+            'location' => 'São Paulo'
+        ], 200);
+    }
 }
