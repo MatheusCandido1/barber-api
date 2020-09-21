@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Barber;
 use App\Models\BarberImage;
 use App\Models\BarberService;
-use App\Models\BarberTestimonials;
+use App\Models\BarberTestimonial;
 use App\Models\BarberAvailability;
 
 class BarberController extends Controller
