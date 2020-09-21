@@ -24,7 +24,7 @@ Route::post('/users/favorites', [UserController::class, 'setFavorites']);
 Route::get('/users/appointments', [UserController::class, 'getAppointments']);
 
 Route::get('/barbers', [BarberController::class, 'getBarbers']);
-Route::get('/barbers/{barber}', [BarberController::class, 'details']);
+Route::get('/barbers/{barber}', [BarberController::class, 'getBarber']);
 Route::post('/barbers/{barber}/appointment', [BarberController::class, 'setAppointment']);
 
 Route::get('/search', [BarberController::class, 'getBarbers']); 
