@@ -23,6 +23,10 @@ class BarberController extends Controller
     public function getBarbers(Request $request) {
         $barbers = Barber::all();
 
+        foreach($barbers as $key => $value) {
+            $barbers[$key]['avatar'] = url('media/avatars/'.$barbers[$key]['avatar']);
+        }
+
         return response()->json([
             'data' => $barbers,
             'location' => 'São Paulo'
