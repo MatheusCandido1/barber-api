@@ -20,8 +20,51 @@ class BarberController extends Controller
         $this->currentUser = auth()->user();
     }
 
+    private function geolocation($address) {
+        $key = env('MAPS_KEY', null);
+        $address = urlencode($address);
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?address='.$address.'&key='.$key;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($response, true);
+    }
+
     public function getBarbers(Request $request) {
-        $barbers = Barber::all();
+        
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+        $city = $request->input('city');
+
+        if(!empty($city)) {
+            $response = $this->geolocation($city);
+
+            if($response['results']) {
+                $latitude = $response['results'][0]['geometry']['location']['lat'];
+                $longitude = $response['results'][0]['geometry']['location']['lng'];
+            }
+        } elseif(!empty($latitude) && !empty($longitude)) {
+            $response = $this->geolocation($latitude.','.$longitude);
+
+            if($response['results']) {
+                $city = $response['results'][0]['formatted_address'];
+            }
+        } else {
+            $latitude = '-23.5630907';
+            $longitude = '-46.6682795';
+            $city = 'São Paulo';
+        }
+
+        
+        $barbers = Barber::select(Barber::raw('*, SQRT(
+            POW(69.1 * (latitude - '.$latitude.'), 2) +
+            POW(69.1 * ('.$longitude.' - longitude) * COS(latitude / 57.3) , 2)) as distance'))
+            ->havingRaw('distance < ?', [5])
+            ->orderBy('distance', 'ASC')
+            ->get();
 
         foreach($barbers as $key => $value) {
             $barbers[$key]['avatar'] = url('media/avatars/'.$barbers[$key]['avatar']);
