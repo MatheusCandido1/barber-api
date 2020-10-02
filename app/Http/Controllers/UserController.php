@@ -26,6 +26,24 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function getFavorites() {
+        $barbers = [];
+        $favorites = UserFavorite::select()
+            ->where('user_id', $this->currentUser->id)
+        ->get();
+
+        if($favorites) {
+            foreach($favorites as $favorite) {
+                $barber = Barber::find($favorite['barber_id']);
+                $barber['avatar'] = url('media/avatars/'.$barber['avatar']);
+                $barbers[] = $barber;
+            }
+        }
+        return response()->json([
+            'data' => $barbers,
+        ], 200);
+    }
+
     public function setFavorites(Request $request) {
         $barber_id = $request->input('barber');
 
@@ -41,6 +59,7 @@ class UserController extends Controller
             if($favorite) {
                 $favorite->delete();
                 return response()->json([
+                    'favorite' => false,
                     'success_message' => 'Barbeiro removido dos favoritos',
                 ], 201);
             } else {
@@ -50,6 +69,7 @@ class UserController extends Controller
                 $favorite->save();
 
                 return response()->json([
+                    'favorite' => true,
                     'success_message' => 'Barbeiro favoritado',
                 ], 201);
             }
