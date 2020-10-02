@@ -82,6 +82,77 @@ class BarberController extends Controller
         ], 200);
     }
 
+    public function setAppointment($id, Request $request) {
+
+        $service = $request->input('service');
+        $year = intval($request->input('year'));
+        $month = intval($request->input('month'));
+        $day = intval($request->input('day'));
+        $hour = intval($request->input('hour'));
+
+        $month = ($month < 10) ? '0'.$month : $month;
+        $day = ($day < 10) ? '0'.$day : $day;
+        $hour = ($hour < 10) ? '0'.$hour : $hour;
+
+        $barberService = BarberService::select()
+            ->where('id', $service)
+            ->where('barber_id', $id)
+        ->first();
+
+        if($barberService) {
+            $appointmentDate = $year.'-'.$month.'-'.$day.' '.$hour.':00:00';
+            if(strtotime($appointmentDate)  > 0 ) {
+                $appointments = UserAppointment::select()
+                    ->where('barber_id', $id)
+                    ->where('appointment', $appointmentDate)
+                ->count();
+
+                if($appointments === 0) {
+                    $weekday = date('w', strtotime($appointmentDate));
+                    $availability = BarberAvailability::select()
+                        ->where('barber_id', $id)
+                        ->where('week_day', $weekday)
+                    ->first();
+                    if($availability) {
+                        $hours = explode(',', $availability['hours_available']);
+                        if(in_array($hour.':00', $hours)) {
+                            $newAppointment = new UserAppointment();
+                            $newAppointment->user_id = $this->currentUser->id;
+                            $newAppointment->barber_id = $id;
+                            $newAppointment->service_id = $service;
+                            $newAppointment->appointment = $appointmentDate;
+                            $newAppointment->save();
+                            
+                            return response()->json([
+                                'success_message' => 'Horário agendado!'
+                            ], 201);
+                        } else {
+                            return response()->json([
+                                'error_message' => 'Erro'
+                            ], 400);
+                        }
+                    } else {
+                        return response()->json([
+                            'error_message' => 'Erro'
+                        ], 400);  
+                    }
+                } else {
+                    return response()->json([
+                        'error_message' => 'Erro'
+                    ], 400);   
+                }
+            } else {
+                return response()->json([
+                    'error_message' => 'Erro'
+                ], 400); 
+            }
+        } else {
+            return response()->json([
+                'error_message' => 'Erro'
+            ], 400);
+        }
+    }
+
     public function getBarber($id) {
 
         $barber = Barber::find($id);
