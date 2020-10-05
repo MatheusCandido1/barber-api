@@ -27,4 +27,4 @@ Route::get('/barbers', [BarberController::class, 'getBarbers']);
 Route::get('/barbers/{barber}', [BarberController::class, 'getBarber']);
 Route::post('/barbers/{barber}/appointment', [BarberController::class, 'setAppointment']);
 
-Route::get('/search', [BarberController::class, 'getBarbers']); 
+Route::get('/search', [BarberController::class, 'searchBarbers']); 

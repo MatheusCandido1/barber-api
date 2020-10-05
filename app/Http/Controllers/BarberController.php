@@ -248,4 +248,22 @@ class BarberController extends Controller
             ], 400);
         }
     }
+
+    public function searchBarbers(Request $request) {
+        $value = $request->input('value');
+
+        if($value) {
+            $barbers = Barber::select()
+                ->where('name', 'LIKE', '%'.$value.'%')
+                ->get();
+
+            return response()->json([
+                'data' => $barbers,
+            ], 200);    
+        } else {
+            return response()->json([
+                'error_message' => 'Erro'
+            ], 400);
+        }
+    }
 }
