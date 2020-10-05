@@ -19,7 +19,7 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/profile', [UserController::class, 'details']);
 Route::put('/profile', [UserController::class, 'update']);
-Route::post('/user/avatar', [UserController::class, 'setAvatar']);
+Route::post('/users/avatar', [UserController::class, 'setAvatar']);
 Route::get('/users/favorites', [UserController::class, 'getFavorites']);
 Route::post('/users/favorites', [UserController::class, 'setFavorites']);
 Route::get('/users/appointments', [UserController::class, 'getAppointments']);

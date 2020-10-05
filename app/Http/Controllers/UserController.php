@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
+
 use App\Models\Barber;
 use App\Models\UserFavorite;
 use App\Models\UserAppointment;
@@ -159,6 +161,31 @@ class UserController extends Controller
     }
 
     public function setAvatar(Request $request) {
+        $rules = [
+            'avatar' => 'required|image|mimes:png,jpg,jpeg'
+        ];
         
+        $validator = Validator::make($request->all(), $rules);
+        if($validator->fails()) {
+            return response()->json([
+                'error_message' => $validator->messages()
+            ], 400);
+        }
+
+        $avatar = $request->file('avatar');
+
+        $folder = public_path('/media/avatars');
+        $filename = md5(time().rand(0,9999)).'.jpg';
+
+        $image = Image::make($avatar->getRealPath());
+        $image->fit(300,300)->save($folder.'/'.$filename);
+
+        $user = User::find($this->currentUser->id);
+        $user->avatar = $filename;
+        $user->save();
+
+        return response()->json([
+            'success_message' => 'Avatar atualizado',
+        ], 200);
     }
 }
