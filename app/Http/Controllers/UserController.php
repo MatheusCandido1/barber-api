@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\Barber;
 use App\Models\UserFavorite;
+use App\Models\UserAppointment;
+use App\Models\BarberService;
 
 class UserController extends Controller
 {
@@ -72,6 +74,39 @@ class UserController extends Controller
                     'favorite' => true,
                     'success_message' => 'Barbeiro favoritado',
                 ], 201);
+            }
+        } else {
+            return response()->json([
+                'error_message' => 'Erro'
+            ], 400);
+        }
+    }
+
+    public function getAppointments() {
+        $response = [];
+        $appointments = UserAppointment::select()
+            ->where('user_id', $this->currentUser->id)
+            ->orderBy('appointment','DESC')
+        ->get();
+
+        if($appointments) {
+            foreach($appointments as $appointment) {
+                $barber = Barber::find($appointment['barber_id']);
+                $barber['avatar'] = url('media/avatars/'.$barber['avatar']);
+
+                $service = BarberService::find($appointment['service_id']);
+
+                $response[] = [
+                    'id' => $appointment['id'],
+                    'appointment' => $appointment['appointment'],
+                    'barber' => $barber,
+                    'service' => $service
+                ];
+
+                return response()->json([
+                    'data' => $response,
+                    'success_message' => 'Barbeiro favoritado',
+                ], 200);
             }
         } else {
             return response()->json([
