@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Validator;
 use App\Models\Barber;
 use App\Models\UserFavorite;
 use App\Models\UserAppointment;
 use App\Models\BarberService;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -105,7 +106,7 @@ class UserController extends Controller
 
                 return response()->json([
                     'data' => $response,
-                    'success_message' => 'Barbeiro favoritado',
+                    'success_message' => '',
                 ], 200);
             }
         } else {
@@ -113,5 +114,47 @@ class UserController extends Controller
                 'error_message' => 'Erro'
             ], 400);
         }
+    }
+
+    public function update(Request $request) {
+        $rules = [
+          'name' => 'min:2',
+          'email' => 'email|unique:users',
+          'password' => 'same:password_confirmation',
+          'password_confirmation' => 'same:password_confirmation'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        
+        if($validator->fails()) {
+            return response()->json([
+                'error_message' => $validator->messages()
+            ], 400);
+        }
+
+        $name = $request->input('name');
+        $email = $request->input('email');
+        $password = $request->input('password');
+        $password_confirmation = $request->input('password_confirmation');
+
+        $user = User::find($this->currentUser->id);
+
+        if($name) {
+            $user->name = $name;
+        }
+
+        if ($email) {
+            $user->email = $email;
+        }
+
+        if ($password) {
+            $user->password = bcrypt($request->input('password'));
+        }
+
+        $user->save();
+
+        return response()->json([
+            'success_message' => 'Perfil atualizado',
+        ], 200);
     }
 }
