@@ -157,4 +157,8 @@ class UserController extends Controller
             'success_message' => 'Perfil atualizado',
         ], 200);
     }
+
+    public function setAvatar(Request $request) {
+        
+    }
 }
