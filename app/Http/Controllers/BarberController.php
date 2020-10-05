@@ -257,6 +257,11 @@ class BarberController extends Controller
                 ->where('name', 'LIKE', '%'.$value.'%')
                 ->get();
 
+            
+            foreach($barbers as $key => $value) {
+                $barbers[$key]['avatar'] = url('media/avatars/'.$barbers[$key]['avatar']);
+            }
+
             return response()->json([
                 'data' => $barbers,
             ], 200);    
